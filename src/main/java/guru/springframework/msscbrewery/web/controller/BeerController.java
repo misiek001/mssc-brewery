@@ -49,7 +49,7 @@ public class BeerController {
     @DeleteMapping({"/{beerId}"})
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void handleDelete(@PathVariable UUID beerId){
-        beerService.deleteById(beerId);
+        beerService.deleteBeerById(beerId);
     }
 
 
