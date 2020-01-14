@@ -9,6 +9,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.ConstraintViolationException;
+import javax.validation.Valid;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @RequestMapping("/api/v1/customer")
@@ -28,7 +32,7 @@ public class CustomerController {
     }
 
     @PostMapping
-    public ResponseEntity handlePost (@RequestBody CustomerDto customerDto){
+    public ResponseEntity handlePost (@Valid  @RequestBody CustomerDto customerDto){
 
         CustomerDto createdDto = customerService.saveCustomer(customerDto);
 
@@ -49,6 +53,13 @@ public class CustomerController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void handleDelete(@PathVariable UUID customerUuid){
         customerService.deleteCustomer(customerUuid);
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<List> constraintViolationHandler(ConstraintViolationException e){
+        List<String> err = new ArrayList<>(e.getConstraintViolations().size());
+        e.getConstraintViolations().forEach(constraintViolation -> err.add(constraintViolation.getPropertyPath() + " : " + constraintViolation.getMessage()));
+    return new ResponseEntity<>(err, HttpStatus.BAD_REQUEST);
     }
 
 }
